@@ -233,6 +233,8 @@
     .mode-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); flex: 1; gap: 4px; }
     .mode-btn { min-width: 0; padding: 7px 4px; color: #9cabb7; border: 1px solid var(--line); background: transparent; cursor: pointer; font: 9px var(--mono); text-align: center; }
     .mode-btn.active { color: var(--green); border-color: rgba(0,255,135,.5); background: rgba(0,255,135,.08); }
+    .performance-toggle { flex: 0 0 auto; padding: 8px 11px; color: #ffe28a; background: rgba(255,190,50,.1); border: 1px solid rgba(255,210,91,.58); box-shadow: 0 0 12px rgba(255,190,50,.12); cursor: pointer; font: 800 9px var(--mono); letter-spacing: .45px; white-space: nowrap; }
+    .performance-toggle:hover, .performance-toggle.active { color: #10130d; background: #ffd05c; border-color: #ffe49a; box-shadow: 0 0 16px rgba(255,190,50,.35); }
     .arena-bottom { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; margin-top: 12px; }
     .shot-charge { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 9px; margin-top: 10px; }
     .shot-charge-label { color: #ffd05c; font: 9px var(--mono); white-space: nowrap; }
@@ -323,6 +325,7 @@
       }
       .nav::-webkit-scrollbar { display: none; }
       .nav a { flex: 0 0 auto; }
+      .nav .performance-toggle { order: -1; }
       .lower-grid { grid-template-columns: 1fr; }
     }
     @media (max-width: 700px) {
@@ -401,6 +404,7 @@
     </a>
     <div class="server-status"><span class="live-dot"></span> SÂN ĐẤU TRỰC TUYẾN <strong id="onlineCount">12.480</strong></div>
     <nav class="nav" aria-label="Điều hướng chính">
+      <button class="performance-toggle" id="performanceToggle" type="button" aria-pressed="false">⚡ FIX LAG: TẮT</button>
       <a href="#arena" class="active">ĐẤU NHANH</a>
       <a href="#roster">CẦU THỦ</a>
       <a href="#skills">KỸ NĂNG</a>
@@ -666,8 +670,8 @@
       player.cooldown = 0;
       const ball = { x: W / 2, y: H / 2, vx: 0, vy: 0, r: 9, lastTouch: "none", owner: null };
       const state = {
-        selected: "neymar", mode: "5V5", running: false, paused: false, ended: false,
-        time: MATCH_DURATION, home: 0, away: 0, stamina: 100, ultimate: 0, skillPoints: 3, shootCharge: 0, shootCharging: false,
+        selected: "neymar", mode: "5V5", running: false, paused: false, ended: false, lowPerformance: false,
+        time: MATCH_DURATION, home: 0, away: 0, stamina: 100, ultimate: 0, skillPoints: 3, shootCharge: 0, shootCharging: false, lastRenderTime: 0,
         kickoffProtection: 0,
         skills: { speed: 1, jump: 1, kick: 1 }, gear: "Giày Tia Chớp", toastTimer: 0, lastTime: 0, goalFlash: 0,
         celebrationTimer: 0, celebrationTeam: "home", celebrationParticles: [], ballTrailParticles: [], ballTrailTimer: 0, skillEffect: null,
@@ -684,7 +688,9 @@
 
       function resizeCanvas() {
         const rect = canvas.getBoundingClientRect();
-        const ratio = Math.max(2, Math.min((window.devicePixelRatio || 1) * 2, 3));
+        const ratio = state.lowPerformance
+          ? Math.max(1, Math.min(window.devicePixelRatio || 1, 1.25))
+          : Math.max(2, Math.min((window.devicePixelRatio || 1) * 2, 3));
         canvas.width = Math.round(rect.width * ratio);
         canvas.height = Math.round(rect.height * ratio);
         const scale = Math.min(canvas.width / W, canvas.height / H);
@@ -694,6 +700,33 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.setTransform(scale, 0, 0, scale, offsetX, offsetY);
         draw();
+      }
+
+      function setLowPerformanceMode(enabled, persist = true, notify = true) {
+        state.lowPerformance = enabled;
+        const button = document.getElementById("performanceToggle");
+        button.classList.toggle("active", enabled);
+        button.setAttribute("aria-pressed", String(enabled));
+        button.textContent = `⚡ FIX LAG: ${enabled ? "BẬT" : "TẮT"}`;
+        if (enabled) {
+          state.ballTrailParticles.length = 0;
+          state.celebrationParticles.length = 0;
+        }
+        resizeCanvas();
+        if (persist) {
+          try {
+            window.localStorage.setItem("strikerX.lowPerformance.v1", String(enabled));
+          } catch (error) {
+            console.error("Không thể lưu tùy chọn chế độ máy yếu.", error);
+            showToast("Không lưu được tùy chọn; chế độ máy yếu vẫn áp dụng đến khi tải lại trang.");
+            return;
+          }
+        }
+        if (notify) {
+          showToast(enabled
+            ? "Đã bật chế độ máy yếu: giảm chi tiết và giới hạn 30 FPS."
+            : "Đã tắt chế độ máy yếu: khôi phục đồ họa đầy đủ.");
+        }
       }
 
       function showToast(message) {
@@ -1734,6 +1767,7 @@
         const skinTones = ["#f0c6a2", "#dca985", "#b97858", "#8d5d48"];
         const time = performance.now() / 1000;
         const drawSpectator = (x, y, index) => {
+          if (state.lowPerformance && index % 2 !== 0) return;
           const point = projectFieldPoint(x, y);
           const scale = 1.65 + .2 * ((y - top) / (bottom - top));
           const color = colors[(index * 7 + Math.floor(x * 3 + y)) % colors.length];
@@ -1928,13 +1962,15 @@
         stadiumLight(W * .24, H * .34, 250, "rgba(255,245,174,.09)");
         stadiumLight(W * .76, H * .36, 250, "rgba(160,239,255,.075)");
         stadiumLight(W * .5, H * .82, 220, "rgba(255,255,210,.055)");
-        ctx.globalAlpha = .52;
-        ctx.fillStyle = ctx.createPattern(grassTexture, "repeat");
-        fillFieldPolygon([
-          { x: FIELD.left, y: FIELD.top }, { x: FIELD.right, y: FIELD.top },
-          { x: FIELD.right, y: FIELD.bottom }, { x: FIELD.left, y: FIELD.bottom }
-        ]);
-        ctx.globalAlpha = 1;
+        if (!state.lowPerformance) {
+          ctx.globalAlpha = .52;
+          ctx.fillStyle = ctx.createPattern(grassTexture, "repeat");
+          fillFieldPolygon([
+            { x: FIELD.left, y: FIELD.top }, { x: FIELD.right, y: FIELD.top },
+            { x: FIELD.right, y: FIELD.bottom }, { x: FIELD.left, y: FIELD.bottom }
+          ]);
+          ctx.globalAlpha = 1;
+        }
         const fieldLight = ctx.createLinearGradient(fieldCorners[0].x, 0, fieldCorners[1].x, 0);
         fieldLight.addColorStop(0, "rgba(237,255,195,.12)");
         fieldLight.addColorStop(.5, "rgba(255,255,225,.065)");
@@ -2085,11 +2121,11 @@
         [...homeBots, player].sort((a, b) => projectFieldPoint(a.x, a.y).y - projectFieldPoint(b.x, b.y).y)
           .forEach(entity => drawPlayer(entity, entity.isControlled ? characters[state.selected].color : entity.color, entity.isControlled ? characters[state.selected].emoji : entity.emoji));
         awayTeam.forEach(entity => drawPlayer(entity, entity.color, entity.emoji, true));
-        drawCharacterSkillEffect();
+        if (!state.lowPerformance) drawCharacterSkillEffect();
         const projectedBall = projectFieldPoint(ball.x, ball.y);
         const ballScale = .78 + .3 * ((ball.y - FIELD.top) / (FIELD.bottom - FIELD.top));
         const ballSpeed = Math.hypot(ball.vx, ball.vy);
-        state.ballTrailParticles.forEach(particle => {
+        if (!state.lowPerformance) state.ballTrailParticles.forEach(particle => {
           const point = projectFieldPoint(particle.x, particle.y);
           const alpha = Math.min(1, particle.life / .18) * .42;
           ctx.save();
@@ -2100,7 +2136,7 @@
           ctx.fillRect(-particle.size * ballScale, -particle.size * .3 * ballScale, particle.size * 2 * ballScale, particle.size * .6 * ballScale);
           ctx.restore();
         });
-        if (ballSpeed > 45) {
+        if (!state.lowPerformance && ballSpeed > 45) {
           const trailLength = Math.min(25, ballSpeed * .045) * ballScale;
           const trailX = projectedBall.x - ball.vx / ballSpeed * trailLength;
           const trailY = projectedBall.y - ball.vy / ballSpeed * trailLength + 2 * ballScale;
@@ -2468,7 +2504,7 @@
         state.ultimate = Math.min(100, state.ultimate + 30);
         state.celebrationTimer = 2.8;
         state.celebrationTeam = team;
-        state.celebrationParticles = Array.from({ length: 72 }, (_, index) => ({
+        state.celebrationParticles = Array.from({ length: state.lowPerformance ? 18 : 72 }, (_, index) => ({
           x: W / 2 + (Math.random() - .5) * 240,
           y: H * .38 + (Math.random() - .5) * 70,
           vx: (Math.random() - .5) * 170,
@@ -2580,7 +2616,7 @@
         [...homePlayers, ...awayTeam].forEach(resolveBallPlayerCollision);
         const ballSpeed = Math.hypot(ball.vx, ball.vy);
         state.ballTrailTimer -= dt;
-        if (ballSpeed > 55 && state.ballTrailTimer <= 0) {
+        if (!state.lowPerformance && ballSpeed > 55 && state.ballTrailTimer <= 0) {
           const perpendicularX = -ball.vy / ballSpeed;
           const perpendicularY = ball.vx / ballSpeed;
           const spread = (Math.random() - .5) * 8;
@@ -2623,7 +2659,10 @@
         const dt = Math.min(.035, (timestamp - (state.lastTime || timestamp)) / 1000);
         state.lastTime = timestamp;
         update(dt);
-        draw();
+        if (!state.lowPerformance || timestamp - state.lastRenderTime >= 1000 / 30) {
+          draw();
+          state.lastRenderTime = timestamp;
+        }
         requestAnimationFrame(loop);
       }
 
@@ -2787,6 +2826,15 @@
       }));
       window.addEventListener("resize", resizeCanvas);
       document.addEventListener("fullscreenchange", updateFullscreenButton);
+      document.getElementById("performanceToggle").addEventListener("click", () => {
+        setLowPerformanceMode(!state.lowPerformance);
+      });
+      try {
+        setLowPerformanceMode(window.localStorage.getItem("strikerX.lowPerformance.v1") === "true", false, false);
+      } catch (error) {
+        console.error("Không thể đọc tùy chọn chế độ máy yếu.", error);
+        showToast("Không thể tải tùy chọn chế độ máy yếu; đang dùng đồ họa mặc định.");
+      }
       loadProfile();
       document.getElementById("profileTeamName").value = profile.teamName;
       document.getElementById("profilePlayerName").value = profile.playerName;

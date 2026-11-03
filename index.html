@@ -215,24 +215,23 @@
       font: 9px var(--mono); letter-spacing: .6px; text-shadow: 0 1px 5px #000;
       pointer-events: none;
     }
-    .match-controls { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-top: 11px; }
+    .match-controls { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; margin-top: 11px; }
     .btn {
       border: 1px solid transparent; cursor: pointer; font: 700 10px var(--mono); letter-spacing: 1px;
-      padding: 11px 14px; transition: .18s; text-transform: uppercase;
+      width: 100%; min-width: 0; min-height: 42px; display: flex; align-items: center; justify-content: center;
+      padding: 8px 6px; line-height: 1.25; text-align: center; transition: .18s; text-transform: uppercase;
     }
     .btn:hover { transform: translateY(-1px); filter: brightness(1.13); }
-    .btn-primary { grid-column: span 2; background: var(--green); color: #06130c; box-shadow: 0 0 17px rgba(0,255,135,.16); }
+    .btn-primary { background: var(--green); color: #06130c; box-shadow: 0 0 17px rgba(0,255,135,.16); }
     .btn-secondary { background: rgba(0,229,255,.06); border-color: rgba(0,229,255,.38); color: var(--cyan); }
     .btn-quiet { background: rgba(255,255,255,.04); border-color: var(--line); color: #b6c2ca; padding-inline: 12px; }
     .btn-skill { color: #d7c3ff; background: rgba(173,122,255,.09); border-color: rgba(173,122,255,.38); }
     .btn-skill:disabled { opacity: .62; cursor: wait; transform: none; }
     .fullscreen-btn { white-space: nowrap; }
-    #characterSkillBtn { grid-column: span 2; }
-    #fullscreenBtn { grid-column: span 2; }
     .mode-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; }
     .mode-label { color: var(--muted); font: 9px var(--mono); letter-spacing: .8px; }
-    .mode-options { display: flex; gap: 4px; }
-    .mode-btn { padding: 7px 9px; color: #9cabb7; border: 1px solid var(--line); background: transparent; cursor: pointer; font: 9px var(--mono); }
+    .mode-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); flex: 1; gap: 4px; }
+    .mode-btn { min-width: 0; padding: 7px 4px; color: #9cabb7; border: 1px solid var(--line); background: transparent; cursor: pointer; font: 9px var(--mono); text-align: center; }
     .mode-btn.active { color: var(--green); border-color: rgba(0,255,135,.5); background: rgba(0,255,135,.08); }
     .arena-bottom { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; margin-top: 12px; }
     .shot-charge { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 9px; margin-top: 10px; }
@@ -313,13 +312,31 @@
       .nav a { padding-inline: 7px; font-size: 9px; }
       .server-status { display: none; }
     }
+    @media (max-width: 850px) {
+      .topbar {
+        height: auto; min-height: 68px; flex-wrap: wrap; gap: 5px 12px;
+        padding-block: 7px;
+      }
+      .nav {
+        order: 3; flex: 1 0 100%; min-width: 0; overflow-x: auto; justify-content: flex-start;
+        scrollbar-width: none;
+      }
+      .nav::-webkit-scrollbar { display: none; }
+      .nav a { flex: 0 0 auto; }
+      .lower-grid { grid-template-columns: 1fr; }
+    }
     @media (max-width: 700px) {
-      .topbar { height: 58px; padding-inline: 13px; }
-      .brand-name { font-size: 21px; }
-      .nav { display: none; }
+      .topbar { min-height: 0; padding: 8px 10px 5px; gap: 5px 8px; }
+      .brand { gap: 7px; }
+      .brand-mark { width: 30px; height: 30px; }
+      .brand-name { font-size: clamp(17px, 5.2vw, 21px); letter-spacing: 1px; }
+      .nav { flex: 1 0 calc(100% + 20px); margin-inline: -10px; padding-inline: 8px; }
+      .nav a { padding: 8px 9px; font-size: 8px; }
       .top-profile { margin-left: auto; }
+      .top-profile > div:last-child { min-width: 0; max-width: 112px; }
+      .profile-name { overflow: hidden; max-width: 100%; text-overflow: ellipsis; }
       .layout { padding: 17px 12px 86px; }
-      .hero { min-height: 0; align-items: flex-start; margin-bottom: 15px; }
+      .hero { min-height: 0; flex-direction: column; align-items: flex-start; gap: 12px; margin-bottom: 15px; }
       .hero p { font-size: 11px; }
       .season-card { padding: 8px; gap: 8px; }
       .season-icon { font-size: 18px; }
@@ -338,10 +355,14 @@
       .scoreboard { min-height: 54px; }
       .score { font-size: 26px; }
       .team-tag { font-size: 8px; }
-      .match-controls .btn { min-width: 0; padding: 10px 6px; font-size: 9px; letter-spacing: .3px; }
+      .match-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
+      .match-controls .btn { min-width: 0; min-height: 42px; padding: 7px 3px; font-size: 8px; letter-spacing: 0; overflow-wrap: anywhere; }
+      #resetBtn { grid-column: 2; }
       .fullscreen-label { display: inline; }
       .mode-label { display: none; }
       .mode-row { justify-content: center; }
+      .mode-options { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .mode-btn { font-size: 8px; padding-inline: 2px; }
       .arena-bottom { grid-template-columns: 1fr auto; }
       .key-strip { display: none; }
       .mobile-controls { position: absolute; z-index: 3; left: 8px; right: 8px; bottom: 8px; display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; padding: 0; background: transparent; border: 0; pointer-events: none; }
@@ -360,6 +381,15 @@
       .clock { min-width: 46px; padding: 6px 4px; font-size: 11px; }
       .lower-grid { grid-template-columns: 1fr; }
       .lower-panel { padding: 13px; }
+    }
+    @media (max-width: 360px) {
+      .top-profile { gap: 6px; }
+      .top-profile > div:last-child { max-width: 86px; }
+      .layout { padding-inline: 9px; }
+      .arena-panel { padding: 8px; }
+      .scoreboard { gap: 5px; }
+      .team-tag { font-size: 6px; }
+      .clock { min-width: 40px; }
     }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
   </style>
@@ -639,7 +669,7 @@
         time: MATCH_DURATION, home: 0, away: 0, stamina: 100, ultimate: 0, skillPoints: 3, shootCharge: 0, shootCharging: false,
         kickoffProtection: 0,
         skills: { speed: 1, jump: 1, kick: 1 }, gear: "Giày Tia Chớp", toastTimer: 0, lastTime: 0, goalFlash: 0,
-        celebrationTimer: 0, celebrationTeam: "home", celebrationParticles: [],
+        celebrationTimer: 0, celebrationTeam: "home", celebrationParticles: [], ballTrailParticles: [], ballTrailTimer: 0, skillEffect: null,
         personalCooldown: 0, personalCooldowns: { neymar: 0, messi: 0, ronaldo: 0, mbappe: 0, vini: 0 }
       };
       const gearBonuses = {
@@ -864,6 +894,7 @@
       function resetMatch(announce = true) {
         state.running = false; state.paused = false; state.ended = false;
         state.time = MATCH_DURATION; state.home = 0; state.away = 0; state.ultimate = 0; state.stamina = 100;
+        state.skillEffect = null; state.ballTrailParticles.length = 0; state.ballTrailTimer = 0;
         Object.keys(state.personalCooldowns).forEach(id => { state.personalCooldowns[id] = 0; });
         state.personalCooldown = 0;
         resetPositions();
@@ -989,6 +1020,7 @@
         const dy = ball.y - player.y;
         const distanceToBall = Math.hypot(dx, dy);
         const aim = direction.moving ? direction : { x: 1, y: 0 };
+        state.skillEffect = { character: state.selected, aim, time: 1.5, duration: 1.5 };
         if (state.selected === "neymar") {
           player.vx = aim.x * 400 * MOVEMENT_SPEED_SCALE; player.vy = aim.y * 400 * MOVEMENT_SPEED_SCALE; player.dash = .3; player.dribble = 2.5;
           if (distanceToBall < 62) {
@@ -1230,6 +1262,107 @@
 
       function projectFieldPoint(x, y, z = 0) {
         return worldToScreen(x, y, z);
+      }
+
+      function drawCharacterSkillEffect() {
+        const effect = state.skillEffect;
+        if (!effect || effect.time <= 0) return;
+        const char = characters[effect.character];
+        const progress = 1 - effect.time / effect.duration;
+        const fade = Math.min(1, progress * 10, (1 - progress) * 6);
+        const projected = projectFieldPoint(player.x, player.y);
+        const depthScale = .78 + .3 * ((player.y - FIELD.top) / (FIELD.bottom - FIELD.top));
+        const angle = Math.atan2(effect.aim.y, effect.aim.x);
+        const radius = 20 + progress * 32;
+        const color = char.skillColor;
+        const now = performance.now() / 1000;
+
+        ctx.save();
+        ctx.translate(projected.x, projected.y - 5 * depthScale);
+        ctx.scale(depthScale, depthScale);
+        ctx.rotate(angle);
+        ctx.globalAlpha = fade;
+        ctx.strokeStyle = color;
+        ctx.fillStyle = color;
+        ctx.lineWidth = 2.5;
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 12;
+
+        if (effect.character === "neymar") {
+          for (let index = 0; index < 3; index += 1) {
+            ctx.beginPath();
+            ctx.ellipse(0, 0, radius + index * 4, 10 + index * 2, now * 2 + index * 2.1, now + index * 2, now + index * 2 + Math.PI * 1.25);
+            ctx.stroke();
+          }
+        } else if (effect.character === "messi") {
+          ctx.setLineDash([5, 5]);
+          ctx.beginPath();
+          ctx.moveTo(9, 0);
+          ctx.lineTo(72 + progress * 12, 0);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          [28, 48, 68].forEach((distance, index) => {
+            ctx.beginPath();
+            ctx.arc(distance, 0, 3 + Math.sin(now * 12 + index) * 1.2, 0, Math.PI * 2);
+            ctx.fill();
+          });
+        } else if (effect.character === "ronaldo") {
+          ctx.beginPath();
+          ctx.arc(0, 0, radius, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(0, 0, radius * .62, now, now + Math.PI * 1.5);
+          ctx.stroke();
+          for (let index = 0; index < 4; index += 1) {
+            const boltAngle = now * .8 + index * Math.PI / 2;
+            const x = Math.cos(boltAngle) * (radius + 7);
+            const y = Math.sin(boltAngle) * (radius + 7);
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + Math.cos(boltAngle + .5) * 6, y + Math.sin(boltAngle + .5) * 6);
+            ctx.lineTo(x + Math.cos(boltAngle - .4) * 10, y + Math.sin(boltAngle - .4) * 10);
+            ctx.stroke();
+          }
+        } else if (effect.character === "mbappe") {
+          for (let index = 0; index < 4; index += 1) {
+            const x = -12 - index * 9 - progress * 12;
+            const y = (index - 1.5) * 8;
+            ctx.globalAlpha = fade * (1 - index * .16);
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x - 9, y);
+            ctx.lineTo(x - 14, y - 4);
+            ctx.moveTo(x - 9, y);
+            ctx.lineTo(x - 14, y + 4);
+            ctx.stroke();
+          }
+        } else if (effect.character === "vini") {
+          for (let index = 0; index < 2; index += 1) {
+            ctx.save();
+            ctx.rotate(now * (index ? -2.4 : 2.4) + index * Math.PI);
+            ctx.beginPath();
+            ctx.ellipse(0, 0, radius, 8, 0, -.2, Math.PI * 1.65);
+            ctx.stroke();
+            ctx.restore();
+          }
+        }
+
+        ctx.globalAlpha = fade;
+        ctx.shadowBlur = 8;
+        for (let index = 0; index < 8; index += 1) {
+          const sparkAngle = now * 3 + index * Math.PI / 4;
+          const sparkRadius = 11 + progress * 27 + Math.sin(now * 10 + index) * 3;
+          const x = Math.cos(sparkAngle) * sparkRadius;
+          const y = Math.sin(sparkAngle) * sparkRadius * .65;
+          ctx.fillRect(x - 1.5, y - 1.5, 3, 3);
+        }
+        ctx.rotate(-angle);
+        ctx.shadowBlur = 10;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = "bold 9px Arial, sans-serif";
+        ctx.fillText(char.skill, 0, -48);
+        ctx.restore();
       }
 
       function traceFieldLine(points, close = false) {
@@ -1951,9 +2084,38 @@
         [...homeBots, player].sort((a, b) => projectFieldPoint(a.x, a.y).y - projectFieldPoint(b.x, b.y).y)
           .forEach(entity => drawPlayer(entity, entity.isControlled ? characters[state.selected].color : entity.color, entity.isControlled ? characters[state.selected].emoji : entity.emoji));
         awayTeam.forEach(entity => drawPlayer(entity, entity.color, entity.emoji, true));
+        drawCharacterSkillEffect();
         const projectedBall = projectFieldPoint(ball.x, ball.y);
         const ballScale = .78 + .3 * ((ball.y - FIELD.top) / (FIELD.bottom - FIELD.top));
         const ballSpeed = Math.hypot(ball.vx, ball.vy);
+        state.ballTrailParticles.forEach(particle => {
+          const point = projectFieldPoint(particle.x, particle.y);
+          const alpha = Math.min(1, particle.life / .18) * .42;
+          ctx.save();
+          ctx.globalAlpha = alpha;
+          ctx.translate(point.x, point.y);
+          ctx.rotate(particle.rotation);
+          ctx.fillStyle = particle.color;
+          ctx.fillRect(-particle.size * ballScale, -particle.size * .3 * ballScale, particle.size * 2 * ballScale, particle.size * .6 * ballScale);
+          ctx.restore();
+        });
+        if (ballSpeed > 45) {
+          const trailLength = Math.min(25, ballSpeed * .045) * ballScale;
+          const trailX = projectedBall.x - ball.vx / ballSpeed * trailLength;
+          const trailY = projectedBall.y - ball.vy / ballSpeed * trailLength + 2 * ballScale;
+          const rollingTrail = ctx.createLinearGradient(trailX, trailY, projectedBall.x, projectedBall.y + 2 * ballScale);
+          rollingTrail.addColorStop(0, "rgba(218,255,190,0)");
+          rollingTrail.addColorStop(1, `rgba(218,255,190,${Math.min(.38, ballSpeed / 850)})`);
+          ctx.save();
+          ctx.strokeStyle = rollingTrail;
+          ctx.lineWidth = Math.max(2, ball.r * ballScale * .65);
+          ctx.lineCap = "round";
+          ctx.beginPath();
+          ctx.moveTo(trailX, trailY);
+          ctx.lineTo(projectedBall.x, projectedBall.y + 2 * ballScale);
+          ctx.stroke();
+          ctx.restore();
+        }
         if (!ball.owner && ballSpeed > 190) {
           const trailLength = Math.min(42, ballSpeed * .065) * ballScale;
           const trailX = projectedBall.x - ball.vx / ballSpeed * trailLength;
@@ -2346,11 +2508,22 @@
         state.stamina = Math.min(100, state.stamina + dt * 12);
         state.goalFlash = Math.max(0, state.goalFlash - dt);
         state.celebrationTimer = Math.max(0, state.celebrationTimer - dt);
+        if (state.skillEffect) {
+          state.skillEffect.time = Math.max(0, state.skillEffect.time - dt);
+          if (state.skillEffect.time === 0) state.skillEffect = null;
+        }
         state.celebrationParticles = state.celebrationParticles.filter(particle => {
           particle.life -= dt;
           particle.x += particle.vx * dt;
           particle.y += particle.vy * dt;
           particle.vy += 230 * dt;
+          particle.rotation += particle.spin * dt;
+          return particle.life > 0;
+        });
+        state.ballTrailParticles = state.ballTrailParticles.filter(particle => {
+          particle.life -= dt;
+          particle.x += particle.vx * dt;
+          particle.y += particle.vy * dt;
           particle.rotation += particle.spin * dt;
           return particle.life > 0;
         });
@@ -2404,6 +2577,26 @@
         ball.vy *= Math.pow(.995, dt * 60);
 
         [...homePlayers, ...awayTeam].forEach(resolveBallPlayerCollision);
+        const ballSpeed = Math.hypot(ball.vx, ball.vy);
+        state.ballTrailTimer -= dt;
+        if (ballSpeed > 55 && state.ballTrailTimer <= 0) {
+          const perpendicularX = -ball.vy / ballSpeed;
+          const perpendicularY = ball.vx / ballSpeed;
+          const spread = (Math.random() - .5) * 8;
+          state.ballTrailParticles.push({
+            x: ball.x - ball.vx / ballSpeed * 5 + perpendicularX * spread,
+            y: ball.y - ball.vy / ballSpeed * 5 + perpendicularY * spread,
+            vx: -ball.vx * .08 + perpendicularX * (Math.random() - .5) * 24,
+            vy: -ball.vy * .08 + perpendicularY * (Math.random() - .5) * 24,
+            life: .18 + Math.random() * .12,
+            size: 1.5 + Math.random() * 2,
+            rotation: Math.atan2(ball.vy, ball.vx),
+            spin: (Math.random() - .5) * 8,
+            color: Math.random() > .5 ? "#d9ffb0" : "#b7e88b"
+          });
+          if (state.ballTrailParticles.length > 32) state.ballTrailParticles.shift();
+          state.ballTrailTimer = Math.max(.025, .09 - ballSpeed / 10000);
+        }
         const inGoalMouth = ball.y >= FIELD.goalTop && ball.y <= FIELD.goalBottom;
         if (ball.x - ball.r <= FIELD.left && inGoalMouth) {
           if (state.running) scoreGoal("away"); else resetPositions();

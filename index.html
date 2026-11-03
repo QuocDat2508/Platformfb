@@ -634,6 +634,7 @@
       const H = 540;
       const MATCH_DURATION = 120;
       const MOVEMENT_SPEED_SCALE = .92;
+      const CONTROLLED_PLAYER_SPEED_SCALE = .86;
       const FIELD = { left: 36, right: W - 36, top: 34, bottom: H - 34, goalTop: 210, goalBottom: 330 };
       const camera = { x: W / 2, y: H / 2 };
       const input = { left: false, right: false, up: false, down: false };
@@ -1003,7 +1004,7 @@
       function dash() {
         if (state.stamina < 18) { showToast("Không đủ thể lực để tăng tốc!"); return; }
         const direction = movementVector();
-        player.vx = direction.x * 440 * MOVEMENT_SPEED_SCALE; player.vy = direction.y * 440 * MOVEMENT_SPEED_SCALE; player.dash = .22;
+        player.vx = direction.x * 440 * CONTROLLED_PLAYER_SPEED_SCALE; player.vy = direction.y * 440 * CONTROLLED_PLAYER_SPEED_SCALE; player.dash = .22;
         state.stamina = Math.max(0, state.stamina - 18);
         showToast("TĂNG TỐC!");
       }
@@ -1022,7 +1023,7 @@
         const aim = direction.moving ? direction : { x: 1, y: 0 };
         state.skillEffect = { character: state.selected, aim, time: 1.5, duration: 1.5 };
         if (state.selected === "neymar") {
-          player.vx = aim.x * 400 * MOVEMENT_SPEED_SCALE; player.vy = aim.y * 400 * MOVEMENT_SPEED_SCALE; player.dash = .3; player.dribble = 2.5;
+          player.vx = aim.x * 400 * CONTROLLED_PLAYER_SPEED_SCALE; player.vy = aim.y * 400 * CONTROLLED_PLAYER_SPEED_SCALE; player.dash = .3; player.dribble = 2.5;
           if (distanceToBall < 62) {
             ball.x += aim.x * 10; ball.y += aim.y * 10;
             ball.vx += aim.x * 80; ball.vy += aim.y * 80;
@@ -1036,16 +1037,16 @@
         } else if (state.selected === "ronaldo") {
           if (distanceToBall < 88) tryKick(1.9, { x: 1, y: ((H / 2) - ball.y) / 360 });
           else {
-            player.vy = -220; player.shield = 1.2;
+            player.vy = -205; player.shield = 1.2;
             showToast("CR7 bật cao tranh chấp!");
           }
         } else if (state.selected === "mbappe") {
-          player.vx = aim.x * 560 * MOVEMENT_SPEED_SCALE; player.vy = aim.y * 560 * MOVEMENT_SPEED_SCALE; player.dash = .48;
+          player.vx = aim.x * 560 * CONTROLLED_PLAYER_SPEED_SCALE; player.vy = aim.y * 560 * CONTROLLED_PLAYER_SPEED_SCALE; player.dash = .48;
           if (distanceToBall < 75) {
             ball.vx += aim.x * 185; ball.vy += aim.y * 185; ball.lastTouch = "home";
           }
         } else if (state.selected === "vini") {
-          player.vx = (aim.x * 300 - aim.y * 220) * MOVEMENT_SPEED_SCALE; player.vy = (aim.y * 300 + aim.x * 220) * MOVEMENT_SPEED_SCALE;
+          player.vx = (aim.x * 300 - aim.y * 220) * CONTROLLED_PLAYER_SPEED_SCALE; player.vy = (aim.y * 300 + aim.x * 220) * CONTROLLED_PLAYER_SPEED_SCALE;
           player.dash = .22; player.dribble = 2;
           if (distanceToBall < 65) {
             ball.x += -aim.y * 15; ball.y += aim.x * 15;
@@ -1208,8 +1209,8 @@
           ball.lastTouch = "home";
           state.goalFlash = .5;
         } else {
-          player.vx = direction.x * 540 * MOVEMENT_SPEED_SCALE;
-          player.vy = direction.y * 540 * MOVEMENT_SPEED_SCALE;
+          player.vx = direction.x * 540 * CONTROLLED_PLAYER_SPEED_SCALE;
+          player.vy = direction.y * 540 * CONTROLLED_PLAYER_SPEED_SCALE;
           player.shield = 1;
         }
         showToast("✦ TUYỆT KỸ NEON OVERDRIVE!");
@@ -1225,8 +1226,8 @@
         } else if (number === "3") {
           player.dash = .55;
           const direction = movementVector();
-          player.vx = direction.x * 560 * MOVEMENT_SPEED_SCALE;
-          player.vy = direction.y * 560 * MOVEMENT_SPEED_SCALE;
+          player.vx = direction.x * 560 * CONTROLLED_PLAYER_SPEED_SCALE;
+          player.vy = direction.y * 560 * CONTROLLED_PLAYER_SPEED_SCALE;
           showToast("Tăng tốc chiến thuật kích hoạt!");
         }
         updateHud();
@@ -2541,7 +2542,7 @@
         if (state.shootCharging) {
           state.shootCharge = Math.min(1.1, state.shootCharge + dt);
         }
-        const speed = (105 + characters[state.selected].speed + (state.skills.speed - 1) * 10 + (gearBonuses[state.gear].speed || 0)) * MOVEMENT_SPEED_SCALE;
+        const speed = (105 + characters[state.selected].speed + (state.skills.speed - 1) * 10 + (gearBonuses[state.gear].speed || 0)) * CONTROLLED_PLAYER_SPEED_SCALE;
         const dashing = player.dash > 0;
         const acceleration = dashing ? 10 : 6 + (state.skills.jump - 1) * 1.2 + (gearBonuses[state.gear].control || 0) / 10;
         if (dashing) player.dash = Math.max(0, player.dash - dt);

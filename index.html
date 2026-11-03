@@ -604,8 +604,8 @@
       const canvas = document.getElementById("gameCanvas");
       const ctx = canvas.getContext("2d");
       const playerSpriteCanvas = document.createElement("canvas");
-      playerSpriteCanvas.width = 32;
-      playerSpriteCanvas.height = 40;
+      playerSpriteCanvas.width = 64;
+      playerSpriteCanvas.height = 80;
       const playerSpriteCtx = playerSpriteCanvas.getContext("2d");
       playerSpriteCtx.imageSmoothingEnabled = false;
       const grassTexture = document.createElement("canvas");
@@ -683,7 +683,7 @@
 
       function resizeCanvas() {
         const rect = canvas.getBoundingClientRect();
-        const ratio = Math.max(2, Math.min(window.devicePixelRatio || 1, 3));
+        const ratio = Math.max(2, Math.min((window.devicePixelRatio || 1) * 2, 3));
         canvas.width = Math.round(rect.width * ratio);
         canvas.height = Math.round(rect.height * ratio);
         const scale = Math.min(canvas.width / W, canvas.height / H);
@@ -1437,7 +1437,7 @@
         }
         playerSpriteCtx.setTransform(1, 0, 0, 1, 0, 0);
         playerSpriteCtx.clearRect(0, 0, playerSpriteCanvas.width, playerSpriteCanvas.height);
-        playerSpriteCtx.setTransform(.4, 0, 0, .4, 16, 20);
+        playerSpriteCtx.setTransform(.8, 0, 0, .8, 32, 40);
         playerSpriteCtx.globalAlpha = 1;
         playerSpriteCtx.lineCap = "square";
         playerSpriteCtx.lineJoin = "miter";
